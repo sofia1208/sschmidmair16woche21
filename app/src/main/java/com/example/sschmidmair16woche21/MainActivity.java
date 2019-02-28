@@ -22,13 +22,16 @@ import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
     View view;
+    Rechnung rechnung;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fillSpinner1();
+        fillSpinner2();
 
+       
 
     }
     private String[] readAssets ()
@@ -38,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
         String line;
         try {
-            line = bufferedReader.readLine();
+
             while((line = bufferedReader.readLine()) != null)
             {
                 return line.split(";");
@@ -72,6 +75,13 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
         spinner.setAdapter(adapter);
     }
+    private void fillSpinner2()
+    {
+        Spinner spinner = findViewById(R.id.spinner2);
+        String[] strings = readAssets();
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, strings);
+        spinner.setAdapter(adapter);
+    }
 
     public void pickDate(View view) {
 
@@ -89,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                                           int monthOfYear, int dayOfMonth) {
 
                         TextView viewById = findViewById(R.id.dateText);
-                        viewById.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                        viewById.setText(dayOfMonth + "." + (monthOfYear + 1) + "." + year);
 
                     }
                 }, year, month, day);
