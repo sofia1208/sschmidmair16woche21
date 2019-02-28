@@ -18,6 +18,9 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     Rechnung rechnung;
     List<Rechnung> list = new ArrayList<>();
     ArrayAdapter<Rechnung> mAdapter;
+    List<String> categorys = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-    private String[] readAssets ()
+    private List<String> readAssets ()
     {
 
         InputStream in = getInputStreamForAsset("reasons.csv");
@@ -56,16 +60,18 @@ public class MainActivity extends AppCompatActivity {
 
             while((line = bufferedReader.readLine()) != null)
             {
-                return line.split(";");
-
-
+                String [] array  =  line.split(";");
+                for (int i = 0; i <array.length ; i++) {
+                    categorys.add(array[i]);
+                }
+                 return categorys;
             }
         }
         catch (Exception e)
         {
 
         }
-        return new String[5];
+        return new ArrayList<>();
 
     }
 
@@ -90,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     private void fillSpinner2()
     {
         Spinner spinner = findViewById(R.id.spinner2);
-        String[] strings = readAssets();
+        List<String> strings = readAssets();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, strings);
         spinner.setAdapter(adapter);
     }
@@ -124,7 +130,18 @@ public class MainActivity extends AppCompatActivity {
         Spinner spinnerCategory = findViewById(R.id.spinner2);
 
         String ausgabe = (String) spinnerAusgaben.getSelectedItem().toString();
-        String category = (String) spinnerCategory.getSelectedItem().toString();
+
+        String category = "";
+        TextView t = findViewById(R.id.textCategory);
+        if(t.getText().equals(""))
+        {
+             category = (String) spinnerCategory.getSelectedItem().toString();
+        }
+        else
+        {
+             category = String.valueOf( t.getText());
+        }
+
 
        TextView textDate =  findViewById(R.id.dateText);
         EditText viewById = findViewById(R.id.moneyText);
@@ -138,7 +155,22 @@ public class MainActivity extends AppCompatActivity {
        ListView lv =  findViewById(R.id.listView);
         bindAdapterToListView(lv,list);
 
+     checkArray(category);
+     fillSpinner2();
+
+
+
     }
+    private void checkArray(String string)
+    {  if(!categorys.contains(string))
+    {
+        categorys.add(string);
+        print();
+    }
+
+    }
+
+
     private void bindAdapterToListView (ListView lv, List list)
     {
         mAdapter = new ArrayAdapter<>(
@@ -147,6 +179,28 @@ public class MainActivity extends AppCompatActivity {
                 list
         );
         lv.setAdapter(mAdapter);
+    }
+    private void print ()
+    {
+        File file = new File("reasons.csv");
+        // if file doesnt exists, then create it
+
+
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+          for(String s : categorys)
+          {
+              bw.write(s +";");
+          }
+
+            bw.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+
     }
 }
 
