@@ -4,10 +4,14 @@ import android.app.DatePickerDialog;
 import android.content.res.AssetManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -17,12 +21,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     View view;
     Rechnung rechnung;
+    List<Rechnung> list = new ArrayList<>();
+    ArrayAdapter<Rechnung> mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +39,11 @@ public class MainActivity extends AppCompatActivity {
         fillSpinner1();
         fillSpinner2();
 
-       
+        TextView viewById = findViewById(R.id.cash);
+        if(Rechnung.cash!=0)
+        {
+            viewById.setText("CA$H " + Rechnung.cash + " €");
+        }
 
     }
     private String[] readAssets ()
@@ -104,7 +116,38 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }, year, month, day);
         datePickerDialog.show();
+
     }
+
+    public void addRechnung(View view) {
+        Spinner spinnerAusgaben = findViewById(R.id.spinner);
+        Spinner spinnerCategory = findViewById(R.id.spinner2);
+
+        String ausgabe = (String) spinnerAusgaben.getSelectedItem().toString();
+        String category = (String) spinnerCategory.getSelectedItem().toString();
+
+       TextView textDate =  findViewById(R.id.dateText);
+        EditText viewById = findViewById(R.id.moneyText);
+
+
+        String text = String.valueOf(viewById.getText());
+        String text1 = (String) textDate.getText();
+
+        list.add(new Rechnung(text1,ausgabe,text ,category));
+
+       ListView lv =  findViewById(R.id.listView);
+        bindAdapterToListView(lv,list);
+
     }
+    private void bindAdapterToListView (ListView lv, List list)
+    {
+        mAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                list
+        );
+        lv.setAdapter(mAdapter);
+    }
+}
 
 

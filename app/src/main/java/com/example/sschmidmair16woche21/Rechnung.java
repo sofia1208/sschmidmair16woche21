@@ -46,5 +46,26 @@ public class Rechnung {
         this.category = category;
     }
 
+    public double berechneCash()
+    {
+        if(ausgabe.equals("Ausgaben"))
+        {
+            return cash = cash - betrag;
+        }
+        else
+        {
+            return cash = cash + betrag;
 
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Rechnung{" +
+                "date='" + date + '\'' +
+                ", ausgabe='" + ausgabe + '\'' +
+                ", betrag=" + betrag +
+                ", category='" + category + '\'' +
+                '}';
+    }
 }
