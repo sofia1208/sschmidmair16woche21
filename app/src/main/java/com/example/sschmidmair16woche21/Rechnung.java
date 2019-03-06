@@ -12,6 +12,7 @@ public class Rechnung {
         this.ausgabe = ausgabe;
         this.betrag = Double.parseDouble(betrag);
         this.category = category;
+        cash = berechneCash();
     }
 
     public String getDate() {
@@ -61,11 +62,6 @@ public class Rechnung {
 
     @Override
     public String toString() {
-        return "Rechnung{" +
-                "date='" + date + '\'' +
-                ", ausgabe='" + ausgabe + '\'' +
-                ", betrag=" + betrag +
-                ", category='" + category + '\'' +
-                '}';
+        return  date + " " + betrag + " " + category;
     }
 }

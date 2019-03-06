@@ -20,10 +20,15 @@ import org.w3c.dom.Text;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -35,11 +40,13 @@ public class MainActivity extends AppCompatActivity {
     List<Rechnung> list = new ArrayList<>();
     ArrayAdapter<Rechnung> mAdapter;
     List<String> categorys = new ArrayList<>();
+    File file = new File("reasons.csv");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        printFirst();
         fillSpinner1();
         fillSpinner2();
 
@@ -50,42 +57,52 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+    private void printFirst ()
+    {
+
+        try {
+            FileOutputStream fos = openFileOutput(file.getName(), MODE_PRIVATE);
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(fos));
+            out.print("Essen;Schuhe;Shoppen;MakeUp;Party");
+            out.flush();
+            out.close();
+
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        }
+
+
+    }
     private List<String> readAssets ()
     {
 
-        InputStream in = getInputStreamForAsset("reasons.csv");
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+        List<String> list = new ArrayList<>();
         String line;
+        categorys.clear();
         try {
 
-            while((line = bufferedReader.readLine()) != null)
+            FileInputStream fis = openFileInput(file.getName());
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            while (true)
             {
-                String [] array  =  line.split(";");
-                for (int i = 0; i <array.length ; i++) {
-                    categorys.add(array[i]);
+                line = in.readLine();
+                if(line == null) break;
+                String[] split = line.split(";");
+                for (int i = 0; i <split.length ; i++) {
+
+                    categorys.add(split[i]);
                 }
-                 return categorys;
             }
         }
         catch (Exception e)
         {
 
         }
-        return new ArrayList<>();
+        return categorys;
 
     }
 
-    private InputStream getInputStreamForAsset (String filename)
-    {
-        AssetManager assets = getAssets();
-        try {
-            return assets.open(filename);
-        }
-        catch (IOException e)
-        {
-            return null;
-        }
-    }
+
     private void fillSpinner1()
     {
         Spinner spinner = findViewById(R.id.spinner);
@@ -97,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     {
         Spinner spinner = findViewById(R.id.spinner2);
         List<String> strings = readAssets();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, strings);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, categorys);
         spinner.setAdapter(adapter);
     }
 
@@ -133,13 +150,15 @@ public class MainActivity extends AppCompatActivity {
 
         String category = "";
         TextView t = findViewById(R.id.textCategory);
-        if(t.getText().equals(""))
+
+        if(t.getText().toString().equals(""))
         {
-             category = (String) spinnerCategory.getSelectedItem().toString();
+
+            category = (String) spinnerCategory.getSelectedItem().toString();
         }
         else
         {
-             category = String.valueOf( t.getText());
+            category = String.valueOf( t.getText());
         }
 
 
@@ -158,6 +177,12 @@ public class MainActivity extends AppCompatActivity {
      checkArray(category);
      fillSpinner2();
 
+        TextView ca = findViewById(R.id.cash);
+        if(Rechnung.cash!=0)
+        {
+            ca.setText("CA$H " + Rechnung.cash + " €");
+        }
+
 
 
     }
@@ -173,35 +198,30 @@ public class MainActivity extends AppCompatActivity {
 
     private void bindAdapterToListView (ListView lv, List list)
     {
-        mAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_1,
-                list
-        );
+        mAdapter =new Rechnung_Adapter(this, R.layout.list_view, list);
         lv.setAdapter(mAdapter);
     }
     private void print ()
     {
-        File file = new File("reasons.csv");
-        // if file doesnt exists, then create it
 
-
-        FileWriter fw = null;
         try {
-            fw = new FileWriter(file.getAbsoluteFile());
-            BufferedWriter bw = new BufferedWriter(fw);
-          for(String s : categorys)
-          {
-              bw.write(s +";");
-          }
+            FileOutputStream fos = openFileOutput(file.getName(), MODE_PRIVATE);
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(fos));
+            for(String c : categorys)
+            {
+                out.print(c + ";");
 
-            bw.close();
+            }
+            out.flush();
+            out.close();
+
         } catch (IOException e1) {
             e1.printStackTrace();
         }
 
 
     }
+
 }
 
 
